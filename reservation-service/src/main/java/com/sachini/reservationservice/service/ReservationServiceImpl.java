@@ -7,6 +7,7 @@ import com.sachini.reservationservice.model.DetailReponse;
 import com.sachini.reservationservice.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -24,6 +25,7 @@ public class ReservationServiceImpl {
         this.reservationRepository = reservationRepository;
     }
 
+    @LoadBalanced
     @Bean
     RestTemplate getRestTemplate(RestTemplateBuilder builder){
         return builder.build();
@@ -61,12 +63,12 @@ public class ReservationServiceImpl {
     }
 
     public Customer getCustomer(int custId){
-        Customer customer = restTemplate.getForObject("http://localhost:8084/services/customer/" + custId, Customer.class);
+        Customer customer = restTemplate.getForObject("http://customer/services/customer/" + custId, Customer.class);
         return customer;
     }
 
     private Room getRoom(int roomId){
-        return restTemplate.getForObject("http://localhost:9191/services/room/"+ roomId,Room.class);
+        return restTemplate.getForObject("http://room/services/room/"+ roomId,Room.class);
 
     }
 }
