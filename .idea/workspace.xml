@@ -48,6 +48,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ReservationApplication" />
   </component>
   <component name="RunManager">
     <configuration name="MusiccApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
@@ -67,7 +68,7 @@
       <option name="presentableId" value="Default" />
       <updated>1658214091919</updated>
       <workItem from="1658214093575" duration="5595000" />
-      <workItem from="1658222213806" duration="6683000" />
+      <workItem from="1658222213806" duration="6832000" />
     </task>
     <servers />
   </component>
