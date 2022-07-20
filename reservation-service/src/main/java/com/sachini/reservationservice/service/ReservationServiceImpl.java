@@ -4,6 +4,7 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.sachini.model.customer.Customer;
 import com.sachini.model.reservation.Reservation;
 import com.sachini.model.room.Room;
+import com.sachini.reservationservice.hystrix.CommonHystrixCommand;
 import com.sachini.reservationservice.hystrix.RoomCommand;
 import com.sachini.reservationservice.model.DetailReponse;
 import com.sachini.reservationservice.repository.ReservationRepository;
@@ -16,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Service
 public class ReservationServiceImpl {
@@ -57,7 +60,7 @@ public class ReservationServiceImpl {
     }
 
 
-    public DetailReponse findDetailResponse(int id){
+    public DetailReponse findDetailResponse(int id) throws ExecutionException, InterruptedException {
         Reservation reservation = findById(id);
         Customer customer = getCustomer(reservation.getCustomerId());
         Room room = getRoom(reservation.getRoomId());
@@ -69,9 +72,17 @@ public class ReservationServiceImpl {
         return new DetailReponse(new Reservation(),new Customer(), new Room());
     }
 
-    public Customer getCustomer(int custId){
-        Customer customer = restTemplate.getForObject("http://customer/services/customer/" + custId, Customer.class);
-        return customer;
+    private Customer getCustomer(int custId) throws ExecutionException, InterruptedException {
+        CommonHystrixCommand<Customer> customerCommonHystrixCommand = new CommonHystrixCommand<Customer>("default", () -> {
+            return restTemplate.getForObject("http://customer/services/customer/" + custId, Customer.class);
+        },() -> {
+            return  new Customer();
+        } );
+//        Customer customer = restTemplate.getForObject("http://customer/services/customer/" + custId, Customer.class);
+//        return customer;
+
+        Future<Customer> customerFuture = customerCommonHystrixCommand.queue();
+        return customerFuture.get();
     }
 
     private Room getRoom(int roomId){

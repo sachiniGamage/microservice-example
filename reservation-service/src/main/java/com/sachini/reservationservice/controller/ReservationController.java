@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/services/reservations")
@@ -26,7 +27,7 @@ public class ReservationController {
     }
 
     @GetMapping (value = "/{id}")
-    public Response getReservation(@PathVariable int id, @RequestParam(required = false) String type){
+    public Response getReservation(@PathVariable int id, @RequestParam(required = false) String type) throws ExecutionException, InterruptedException {
         if(type == null){
             return new SimpleResponse(reservationService.findById(id));
 
