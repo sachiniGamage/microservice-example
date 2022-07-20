@@ -4,6 +4,7 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.sachini.model.customer.Customer;
 import com.sachini.model.reservation.Reservation;
 import com.sachini.model.room.Room;
+import com.sachini.reservationservice.hystrix.RoomCommand;
 import com.sachini.reservationservice.model.DetailReponse;
 import com.sachini.reservationservice.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,12 +56,10 @@ public class ReservationServiceImpl {
         return reservationRepository.findAll();
     }
 
-    //this doesn't work for inner methods
-    @HystrixCommand(fallbackMethod = "findDetailResponsefallback")
+
     public DetailReponse findDetailResponse(int id){
         Reservation reservation = findById(id);
-//        Customer customer = getCustomer(reservation.getCustomerId());
-        Customer customer = restTemplate.getForObject("http://customer/services/customer/" + id, Customer.class);
+        Customer customer = getCustomer(reservation.getCustomerId());
         Room room = getRoom(reservation.getRoomId());
 
         return  new DetailReponse(reservation,customer,room);
@@ -76,7 +75,11 @@ public class ReservationServiceImpl {
     }
 
     private Room getRoom(int roomId){
-        return restTemplate.getForObject("http://room/services/room/"+ roomId,Room.class);
+
+        RoomCommand roomCommand = new RoomCommand(restTemplate,roomId);
+        return roomCommand.execute();
+
+//        return restTemplate.getForObject("http://room/services/room/"+ roomId,Room.class);
 
     }
 }
